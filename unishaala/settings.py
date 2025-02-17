@@ -16,7 +16,7 @@ import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print(BASE_DIR)
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-2)xpkft6swshg1nksdoxf=)863im#l60@41r%-f44#9)-6!1z8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -201,7 +201,7 @@ STORAGES = {
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost",'3.7.175.84']
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5173",
