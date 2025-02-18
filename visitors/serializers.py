@@ -43,7 +43,7 @@ class RegisterSerializer(serializers.Serializer):
         otp_instance.save()
 
         validated_data.pop('otp')
-        print(f"validated_data-> {validated_data}")
+        # print(f"validated_data-> {validated_data}")
         
         # Create the user
         user = User.objects.create(username=validated_data["username"], email=validated_data["email"])

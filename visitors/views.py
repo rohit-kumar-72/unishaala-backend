@@ -62,10 +62,17 @@ class RegisterApi(APIView):
             },status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
+        print(serializer.data)
+        user=authenticate(username=serializer.data['username'], password=data['password'])
+        token,_=Token.objects.get_or_create(user=user)
+
         return Response({
             "status":201,
             "message":"user created successfully",
-            "success":True
+            "success":True,
+            "data":{
+                "token":str(token)
+            }
         },status=status.HTTP_201_CREATED)
 
 # login api 

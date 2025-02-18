@@ -18,7 +18,7 @@ class Slots(models.Model):
 
 
 class AnswerSheet(models.Model):
-    question_Id=models.PositiveIntegerField()
+    question_Id=models.PositiveBigIntegerField()
     question_no=models.PositiveIntegerField(null=True,blank=True)
     answer=models.CharField(max_length=50)
     q_type=models.CharField(max_length=20)
