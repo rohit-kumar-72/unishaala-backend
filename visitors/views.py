@@ -66,12 +66,19 @@ class RegisterApi(APIView):
         user=authenticate(username=serializer.data['username'], password=data['password'])
         token,_=Token.objects.get_or_create(user=user)
 
+        if hasattr(user, 'profile'):
+            candidateSerializer=ProfileSerializer(instance=user.profile)
+            candidate=candidateSerializer.data
+        else:
+            candidate=None
+
         return Response({
             "status":201,
             "message":"user created successfully",
             "success":True,
             "data":{
-                "token":str(token)
+                "token":str(token),
+                "candidate":candidate
             }
         },status=status.HTTP_201_CREATED)
 
@@ -103,12 +110,19 @@ class LoginApi(APIView):
         # print("******************")
         # print(request.user) # giving anonymous user as we have not loggedin using login or authenticated using token
 
+        if hasattr(user, 'profile'):
+            candidateSerializer=ProfileSerializer(instance=user.profile)
+            candidate=candidateSerializer.data
+        else:
+            candidate=None
+
         return Response({
             "status":200,
             "message":"Logged in successfull",
             "success":True,
             "data":{
-                "token":str(token)
+                "token":str(token),
+                "candidate":candidate
             }
         },status=status.HTTP_200_OK)
     
