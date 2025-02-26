@@ -167,6 +167,16 @@ class ProfileApi(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
     def post(self,request):
+        number=request.data.get('phone_number')
+        # print(number)
+        if Profile.objects.filter(phone_number=number).exists():
+            return Response({
+                "status": 400,
+                "message": "Mobile Number already registered",
+                "success": False,
+                "error": "Mobile Number already registered"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
             profile=request.user.profile
             serializer=ProfileSerializer(profile,data=request.data)
@@ -180,17 +190,7 @@ class ProfileApi(APIView):
                 "errors": serializer.errors,
                 "success": False
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        number=serializer.data.get('phone_number')
-        user=Profile.objects.get(phone_number=number)
-        if user:
-            return Response({
-                "status": 400,
-                "message": "Mobile Number already registered",
-                "success": False,
-                "error":"Mobile Number already registered"
-            }, status=status.HTTP_200_OK)
-        
+              
         serializer.save(user=request.user)
         
         return Response({
