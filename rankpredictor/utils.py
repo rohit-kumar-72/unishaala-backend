@@ -32,7 +32,7 @@ def parse_csv(csv_file):
     Validates the format and checks required headers.
     """
     try:
-        decoded_file = csv_file.read().decode('utf-8').splitlines()
+        decoded_file = csv_file.read().decode('ISO-8859-1').splitlines()
         csv_reader = csv.DictReader(decoded_file)
 
         # Check if required headers are present
@@ -87,17 +87,18 @@ def validate_row(row):
     # Validate and transform answers based on question type
     if q_type == 'MCQ':
         # For MCQ, store the answer as a single character (e.g., 'a')
-        options = [opt.strip() for opt in answer.strip('()').split(',')]
-        if len(options) != 1 or not options[0].isalpha() or len(options[0]) != 1:
-            raise ValueError(f"Invalid answer for MCQ. Answer must be a single alphabetic character.")
-        row['answer'] = options[0]  # Store as a single character
+        # options = [opt.strip() for opt in answer.strip('()').split(',')]
+        # if len(options) != 1 or not options[0].isalpha() or len(options[0]) != 1:
+        #     raise ValueError(f"Invalid answer for MCQ. Answer must be a single alphabetic character.")
+        row['answer'] = answer.split('///')[-1]  # Store as a single character
 
     elif q_type == 'MSQ':
         # For MSQ, store the answer as comma-separated characters (e.g., 'a,b,c')
-        options = [opt.strip() for opt in answer.strip('()').split(',')]
-        if any(not opt.isalpha() or len(opt) != 1 for opt in options):
-            raise ValueError(f"Invalid options for MSQ. Options must be single alphabetic characters.")
-        row['answer'] = ','.join(options)  # Store as comma-separated characters
+        # options = [opt.strip() for opt in answer.strip('()').split(',')]
+        # if any(not opt.isalpha() or len(opt) != 1 for opt in options):
+        #     raise ValueError(f"Invalid options for MSQ. Options must be single alphabetic characters.")
+        row["answer"] = [ans.split("///")[-1] for ans in answer.split(",")]
+  # Store as comma-separated characters
 
     elif q_type == 'NAT':
         # For NAT, transform the answer format (e.g., '(3.99) (2-4) (5-6)' -> '3.99 OR 2 to 4 OR 5 to 6')
@@ -182,6 +183,13 @@ def save_answer_sheet_data(parsed_data, slot_id):
 
 
 def get_candidate_response(url):
+    option_index_map={
+        "A":1,
+        "B":2,
+        "C":3,
+        "D":4,
+    }
+    
     website = requests.get(url)
     
     soup = BeautifulSoup(website.text, "html.parser")
@@ -218,13 +226,28 @@ def get_candidate_response(url):
         }
 
         if is_answered:
-            if question_type in ["MCQ","MSQ"]:
+            if question_type =="MCQ":
+                all_images=all_question_table[indx].find_all('img')
+                question_answer=all_images[option_index_map[answer_table_data[7].text.strip()]].get('src').split('///')[-1]
+                question_object["candidate_answer"]=question_answer
+            elif question_type == "MSQ":
                 # print("inside mcq,msq")
-                question_answer=answer_table_data[7].text.strip()
+                all_images=all_question_table[indx].find_all('img')
+                all_answers=answer_table_data[7].text.strip().replace(' ','').split(',')
+                question_answer_list=[]
+                for answer in all_answers:
+                    question_answer=all_images[option_index_map[answer]].get('src').split('///')[-1]
+                    question_answer_list.append(f"{question_answer}")
+                question_object["candidate_answer"]=question_answer_list
+
+        # if is_answered:
+        #     if question_type in ["MCQ","MSQ"]:
+        #         # print("inside mcq,msq")
+        #         question_answer=answer_table_data[7].text.strip()
             else:
                 question_answer=all_question_table[indx].find_all('tr')[2].find_all('td')[-1].text.strip()
-
-            question_object["candidate_answer"]=question_answer
+                question_object['candidate_answer']=question_answer
+        #     question_object["candidate_answer"]=question_answer
         
             candidate_answer_record.append(question_object)
 

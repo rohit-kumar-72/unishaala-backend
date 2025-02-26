@@ -20,7 +20,7 @@ class Slots(models.Model):
 class AnswerSheet(models.Model):
     question_Id=models.PositiveBigIntegerField()
     question_no=models.PositiveIntegerField(null=True,blank=True)
-    answer=models.CharField(max_length=50)
+    answer=models.CharField(max_length=500)
     q_type=models.CharField(max_length=20)
     mark=models.FloatField()
     slot=models.ForeignKey(Slots,on_delete=models.CASCADE)
