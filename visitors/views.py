@@ -181,6 +181,16 @@ class ProfileApi(APIView):
                 "success": False
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        number=serializer.data.get('phone_number')
+        user=Profile.objects.get(phone_number=number)
+        if user:
+            return Response({
+                "status": 400,
+                "message": "Mobile Number already registered",
+                "success": False,
+                "error":"Mobile Number already registered"
+            }, status=status.HTTP_200_OK)
+        
         serializer.save(user=request.user)
         
         return Response({

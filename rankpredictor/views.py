@@ -9,6 +9,7 @@ from .models import Slots,AnswerSheet,CandidateScore
 from .utils import handle_csv_upload, get_candidate_response, get_candidate_rank, calculate_gate_score, calculate_normalized_marks, calculate_normalized_rank
 import requests
 from bs4 import BeautifulSoup
+import ast
 # Create your views here.
 
 
@@ -224,6 +225,9 @@ def predictRank(request):
         # Scrape data from the URL
         try:
             scraped_data = get_candidate_response(url)  # Replace with your scraping function
+            # return Response({
+            #     "data":scraped_data
+            # })
         except Exception as e:
             return Response({
                 "status": 400,
@@ -268,7 +272,8 @@ def predictRank(request):
         for user_response in scraped_data:
             question_Id = int(user_response['question_Id'])
             q_type = user_response['q_type']
-            candidate_answer = user_response['candidate_answer'].strip().replace(" ", "")
+            # candidate_answer = user_response['candidate_answer'].strip().replace(" ", "")
+            candidate_answer = user_response['candidate_answer']
 
             if question_Id in answer_key:
                 correct_answer, mark, q_type_db, question_no = answer_key[question_Id]
@@ -283,10 +288,20 @@ def predictRank(request):
                     marks_awarded = mark if is_correct else - (mark / 3)  # Deduct 1/3 for incorrect answer
 
                 elif q_type_db == 'MSQ':  # Multiple correct options (Case insensitive)
-                    correct_options = set(correct_answer.replace(" ", "").lower().split(','))
-                    user_options = set(candidate_answer.replace(" ", "").lower().split(','))
+                    
+                    try:
+                        correct_options = set(ast.literal_eval(correct_answer))  # Convert string to list then to set
+                    except (SyntaxError, ValueError):
+                        correct_options = set(correct_answer.strip("[]").split(","))  # Convert string to list and then to set
+                    user_options = set(candidate_answer)  # Convert list to set
+
                     is_correct = correct_options == user_options  # Exact match required
                     marks_awarded = mark if is_correct else 0
+
+                    # correct_options = set(correct_answer.replace(" ", "").lower().split(','))
+                    # user_options = set(candidate_answer.replace(" ", "").lower().split(','))
+                    # is_correct = correct_options == user_options  # Exact match required
+                    # marks_awarded = mark if is_correct else 0
 
                 elif q_type_db == 'NAT':  # Numeric answer type (No negative marking)
                     try:
