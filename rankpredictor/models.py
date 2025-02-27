@@ -36,7 +36,7 @@ class CandidateScore(models.Model):
     normalized_marks = models.FloatField(null=True, blank=True)
     gate_score = models.FloatField(null=True, blank=True)
     sheet_url = models.CharField(max_length=500, null=True, blank=True)
-    rank=models.CharField(max_length=20, null=True, blank=True)
+    rank=models.CharField(max_length=50, null=True, blank=True)
     normalized_rank=models.CharField(max_length=20, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
