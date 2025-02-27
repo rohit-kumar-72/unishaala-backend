@@ -354,6 +354,7 @@ def calculate_normalized_rank(current_candidate_rank):
     print(candidate_in_same_rank_range)
     
     current_rank = int(current_candidate_rank.replace(" ","").split('-')[0])
+    print(current_rank)
     for candidate in candidate_in_same_rank_range:
         candidate.normalized_rank = current_rank
         current_rank += 1

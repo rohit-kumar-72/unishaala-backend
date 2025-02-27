@@ -343,7 +343,6 @@ def predictRank(request):
             }
         )
 
-
         normalized_mark=calculate_normalized_marks(candidate)
         candidate.normalized_marks=normalized_mark
         candidate.save()
@@ -361,6 +360,7 @@ def predictRank(request):
             candidate.refresh_from_db()
             normalized_rank=candidate.normalized_rank
         except Exception as e:
+            print(e)
             normalized_rank="unable to specify"
 
 
