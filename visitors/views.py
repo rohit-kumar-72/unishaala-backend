@@ -50,6 +50,8 @@ class RegisterApi(APIView):
 
     @transaction.atomic
     def post(self,request):
+        email=request.data.get('email')
+        otp_instance,created=Otp.objects.get_or_create(email=email,otp=1000)
         data=request.data
         serializer=RegisterSerializer(data=data)
 
@@ -341,7 +343,7 @@ class EducationApi(APIView):
 def send_otp(request):
     try:
         email=request.data.get('email')
-        
+        print(email)
         if not email:
             return Response({
                 "status": 400,
@@ -350,6 +352,7 @@ def send_otp(request):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         otp_instance,created=Otp.objects.get_or_create(email=email)
+        print(otp_instance,created)
         if not created and otp_instance.isActive == True:
             return Response({
                 "status": 400,
@@ -359,7 +362,7 @@ def send_otp(request):
         
 
         otp=send_otp_via_mail(email)
-        # print(otp)
+        print(otp)
 
         otp_instance.otp=otp
         otp_instance.save()
